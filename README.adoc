@@ -1,11 +1,11 @@
 = Books
 
-This is a simple API project in Vertx for learning purposes. Buy the end of the project a VueJs Frontend will built to consume the API.
+This is a simple API project in Vertx for learning purposes. By the end of the project a VueJs Frontend will be built to consume the API.
 
 == Available Endpoints
 - `GET /books` - Get all books
 - `GET /books/:isbn` - Get specific book
-- `POST /books` - Add a new book 
+- `POST /books` - Add a new book
 - `PUT /books/:isbn` - Update a specific book
 - `DELETE /books/:isbn` - Delete a specific book
 
