@@ -9,16 +9,18 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MainVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
   private InMemoryBookStore store = new InMemoryBookStore();
+  private JDBCBookRepository booksRepo;
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {
-
+    booksRepo = new JDBCBookRepository(vertx); //init db
     //Initialize Router
     Router books = Router.router(vertx);
     books.route().handler(BodyHandler.create());
@@ -37,7 +39,6 @@ public class MainVerticle extends AbstractVerticle {
     //Handle errors
     handleErrors(books);
 
-
     startServer(startFuture, books);
   }
 
@@ -50,20 +51,26 @@ public class MainVerticle extends AbstractVerticle {
     });
   }
 
-  private void destroy(Router books) {
+  private void destroy(final Router books) {
     books.delete("/books/:isbn").handler(req -> {
       final String isbn = req.pathParam("isbn");
-      final Book deletedBook = store.destroy(isbn);
-      if (deletedBook == null) {
-        req.response()
-          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-          .setStatusCode(HttpResponseStatus.NOT_FOUND.code())
-          .end(new JsonObject().put("message", "ISBN does not match any book in the database").encode());
-      } else {
-        req.response()
-          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-          .end(new JsonObject().put("message", "Book Deleted Successfully").encode());
-      }
+      booksRepo.delete(isbn).setHandler(ar -> {
+        if (ar.failed()) {
+          req.fail(ar.cause());
+          return;
+        }
+        if (ar.result() == null) {
+          req.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+            .setStatusCode(HttpResponseStatus.NOT_FOUND.code())
+            .end(new JsonObject().put("message", "ISBN does not match any book in the database").encode());
+        } else {
+          req.response()
+            .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+            .end(new JsonObject().put("message", "Book Deleted Successfully").encode());
+        }
+      });
+
     });
   }
 
@@ -88,11 +95,16 @@ public class MainVerticle extends AbstractVerticle {
     books.put("/books/:isbn").handler(req -> {
       final String isbn = req.pathParam("isbn");
       final JsonObject requestBody = req.getBodyAsJson();
-      final Book updatedBook = store.update(isbn, requestBody.mapTo(Book.class));
-
-      req.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-        .end(JsonObject.mapFrom(updatedBook).encode());
+      booksRepo.update(isbn, requestBody.mapTo(Book.class)).setHandler(ar -> {
+        if (ar.failed()) {
+          req.fail(ar.cause());
+          return;
+        }
+        req.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+          .setStatusCode(HttpResponseStatus.CREATED.code())
+          .end(requestBody.encode());
+      });
     });
   }
 
@@ -101,22 +113,36 @@ public class MainVerticle extends AbstractVerticle {
       //get the body
       final JsonObject requestBody = req.getBodyAsJson();
       //store book in memory
-      store.add(requestBody.mapTo(Book.class));
-      req.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-        .setStatusCode(HttpResponseStatus.CREATED.code())
-        .end(requestBody.encode());
+      booksRepo.create(requestBody.mapTo(Book.class)).setHandler(ar -> {
+        if (ar.failed()) {
+          req.fail(ar.cause());
+          return;
+        }
+        req.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+          .setStatusCode(HttpResponseStatus.CREATED.code())
+          .end(requestBody.encode());
 
+      });
     });
+
   }
 
   private void all(Router books) {
     books.get("/books").handler(req -> {
       LOG.info("Printing list of books");
-      req.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-        .end(store.getAll().encode());
+      booksRepo.getAll().setHandler(ar -> {
+        if (ar.failed()) {
+          //forward call
+          req.fail(ar.cause());
+          return;
+        }
+        req.response()
+          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+          .end(ar.result().encode());
+      });
     });
+
   }
 
   private void startServer(Future<Void> startFuture, Router books) {

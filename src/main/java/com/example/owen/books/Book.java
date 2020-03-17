@@ -1,8 +1,11 @@
 package com.example.owen.books;
 
+import java.util.Date;
+
 public class Book {
   private long isbn;
   private String title;
+  private Date created_at;
 
   public Book(){
     //default constructor
