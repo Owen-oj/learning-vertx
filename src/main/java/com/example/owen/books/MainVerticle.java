@@ -77,18 +77,18 @@ public class MainVerticle extends AbstractVerticle {
   private void show(Router books) {
     books.get("/books/:isbn").handler(req -> {
       final String isbn = req.pathParam("isbn");
-      final Book book = store.get(isbn);
-      if (book == null) {
+      booksRepo.getOne(isbn).setHandler(ar -> {
+        if (ar.failed()) {
+          req.fail(ar.cause());
+          return;
+        }
         req.response()
           .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-          .setStatusCode(HttpResponseStatus.NOT_FOUND.code())
-          .end(new JsonObject().put("message", "ISBN does not match any book in the database").encode());
-      } else {
-        req.response()
-          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-          .end(JsonObject.mapFrom(book).encode());
-      }
+          .setStatusCode(HttpResponseStatus.CREATED.code())
+          .end(ar.result().encode());
+      });
     });
+
   }
 
   private void update(Router books) {

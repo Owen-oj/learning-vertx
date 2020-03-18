@@ -6,11 +6,15 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class JDBCBookRepository {
   private SQLClient sql;
+  private static final Logger LOG = LoggerFactory.getLogger(JDBCBookRepository.class);
+
 
   public JDBCBookRepository(final Vertx vertx) {
 
@@ -39,6 +43,28 @@ public class JDBCBookRepository {
     return getAll;
   }
 
+  public Future<JsonObject> getOne(String isbn) {
+    int id = Integer.parseInt(isbn);
+    final JsonArray params = new JsonArray().add(id);
+    final Future<JsonObject> toBeRetrieved = Future.future();
+    sql.queryWithParams("SELECT * FROM books WHERE books.isbn = ? LIMIT 1", params, ar -> {
+      if (ar.failed()) {
+        //forward error
+        toBeRetrieved.fail(ar.cause());
+        LOG.error("Failure", ar.cause());
+        return;
+      }
+      if (ar.result().getNumRows() == 0) {
+        toBeRetrieved.fail(new ClassNotFoundException("Repo not updated"));
+      } else {
+        final JsonObject book = new JsonObject().put("data", ar.result().getRows().get(0));
+        toBeRetrieved.complete(book);
+      }
+
+    });
+    return toBeRetrieved;
+  }
+
   //Create A book
   public Future<Void> create(final Book bookToAdd) {
     final Future<Void> added = Future.future();
@@ -59,6 +85,7 @@ public class JDBCBookRepository {
     return added;
   }
 
+  //Delete a Book
   public Future<String> delete(String isbn) {
     int id = Integer.parseInt(isbn);
     final JsonArray params = new JsonArray().add(id);
@@ -79,6 +106,7 @@ public class JDBCBookRepository {
     return toBeDeleted;
   }
 
+  //Update a book
   public Future<Void> update(String isbn, Book bookToUpdate) {
     int id = Integer.parseInt(isbn);
     final Future<Void> updated = Future.future();
