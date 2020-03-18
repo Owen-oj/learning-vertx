@@ -43,6 +43,12 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <!--MORPHIA Object Document Mapper-->
+      <dependency>
+        <groupId>dev.morphia.morphia</groupId>
+        <artifactId>core</artifactId>
+        <version>1.5.8</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
