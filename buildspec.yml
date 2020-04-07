@@ -1,4 +1,4 @@
-version: 0.1
+version: 0.2
 
 phases:
   pre_build:
@@ -12,13 +12,13 @@ phases:
       - echo Build started on `date`
       - echo building the Docker image
       - docker build -t vertx/books .
-      - docker tag 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latest 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:$IMAGE_TAG
+      - docker tag 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latest 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latestbuild
   post_build:
     commands:
       - echo Build completed on `date`
       - echo pushing the Docker image
       - docker push 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latest
-      - docker push 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:$IMAGE_TAG
+      - docker push 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latestbuild
 artifacts:
   files:
     - target/books-1.0.0-SNAPSHOT-fat.jar
