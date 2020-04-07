@@ -150,7 +150,7 @@ public class MainVerticle extends AbstractVerticle {
     vertx.createHttpServer().requestHandler(books).listen(8888, http -> {
       if (http.succeeded()) {
         startFuture.complete();
-        LOG.info("HTTP server started on port 8888");
+        LOG.info("HTTP server started on port 8888 !!");
       } else {
         System.out.println(http.cause().getMessage());
         startFuture.fail(http.cause());
