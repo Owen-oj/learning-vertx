@@ -19,10 +19,10 @@ public class JDBCBookRepository {
   public JDBCBookRepository(final Vertx vertx) {
 
     final JsonObject config = new JsonObject();
-    config.put("url", "jdbc:postgresql://127.0.0.1/books");
+    config.put("url", "jdbc:postgresql://postgres-sql.cqfq2rc5m2mc.us-east-1.rds.amazonaws.com/books");
     config.put("driver_class", "org.postgresql.Driver");
     config.put("user", "postgres");
-    config.put("password", "secret");
+    config.put("password", "secret20");
     sql = JDBCClient.createShared(vertx, config);
   }
 

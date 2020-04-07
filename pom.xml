@@ -109,15 +109,32 @@
 
   <build>
     <plugins>
+      <plugin>
+
+        <!-- Building an executable jar -->
+
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <!-- give full qualified name of your main class-->
+              <mainClass>${main.verticle}</mainClass>
+
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
       <!--      Database Migration-->
       <plugin>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
         <version>6.3.1</version>
         <configuration>
-          <url>jdbc:postgresql://127.0.0.1/books</url>
+          <url>jdbc:postgresql://postgres-sql.cqfq2rc5m2mc.us-east-1.rds.amazonaws.com/books</url>
           <user>postgres</user>
-          <password>secret</password>
+          <password>secret20</password>
         </configuration>
         <dependencies>
           <dependency>
