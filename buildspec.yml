@@ -11,7 +11,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo building the Docker image
-      - docker build -t vertx/books
+      - docker build -t vertx/books .
       - docker tag 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:latest 268021257063.dkr.ecr.us-east-1.amazonaws.com/test/vertx-books:$IMAGE_TAG
   post_build:
     commands:
