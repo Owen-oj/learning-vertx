@@ -10,7 +10,6 @@ ENV VERTICLE_HOME /usr/verticles
 ENV VERTX_OPTS "-Dvertx.options.eventLoopPoolSize=26 -Dvertx.options.deployment.worker=true"
 #ENV CLASSPATH "/target/classes/:/usr/verticles/classes/:"
 
-
 EXPOSE 8888
 
 # Copy your fat jar to the container
