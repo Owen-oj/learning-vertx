@@ -1,0 +1,4 @@
+com\example\owen\books\Book.class
+com\example\owen\books\JDBCBookRepository.class
+com\example\owen\books\InMemoryBookStore.class
+com\example\owen\books\MainVerticle.class

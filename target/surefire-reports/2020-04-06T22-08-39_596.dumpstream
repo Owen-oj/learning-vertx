@@ -1,0 +1,15 @@
+# Created at 2020-04-06T22:08:43.304
+WARNING: An illegal reflective access operation has occurred
+
+# Created at 2020-04-06T22:08:43.305
+WARNING: Illegal reflective access by io.netty.resolver.dns.DnsNameResolver (file:/C:/Users/OwenAkli/.m2/repository/io/netty/netty-resolver-dns/4.1.34.Final/netty-resolver-dns-4.1.34.Final.jar) to method sun.net.dns.ResolverConfiguration.open()
+
+# Created at 2020-04-06T22:08:43.306
+WARNING: Please consider reporting this to the maintainers of io.netty.resolver.dns.DnsNameResolver
+
+# Created at 2020-04-06T22:08:43.307
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+
+# Created at 2020-04-06T22:08:43.308
+WARNING: All illegal access operations will be denied in a future release
+
