@@ -24,7 +24,7 @@
 
     <main.verticle>com.example.owen.books.MainVerticle</main.verticle>
     <slf4j-api.version>1.7.25</slf4j-api.version>
-    <postgresql.version>42.2.1</postgresql.version>
+    <postgresql.version>42.3.3</postgresql.version>
   </properties>
 
   <dependencyManagement>
